@@ -5,9 +5,15 @@ import {
   loadStorageStatistic,
   setLocalStorage,
 } from "@/storage";
-import { StatisticType } from "@/types/types";
+import {
+  DefaultRangeType,
+  FieldsType,
+  OperatorsType,
+  PanelType,
+  StatisticType,
+} from "@/types/types";
+import { createLogger } from "vuex";
 
-// @ts-ignore
 export const main = {
   state: {
     defaultRange: {
@@ -52,12 +58,16 @@ export const main = {
       degree: false,
     },
     operators: [],
+    count: 0,
+    showHint: false,
+    showModalComplete: false,
+    showModalError: false,
   },
   mutations: {
-    clearFields(state: any) {
+    clearFields(state: FieldsType) {
       state.fields = [];
     },
-    clearStatistic(state: any) {
+    clearStatistic(state: StatisticType) {
       state.statistic = {
         ...state.statistic,
         completeTasksSession: 0,
@@ -67,10 +77,17 @@ export const main = {
     },
   },
   getters: {
+    getModals(state: any) {
+      return {
+        showHint: state.showHint,
+        showModalComplete: state.showModalComplete,
+        showModalError: state.showModalError,
+      };
+    },
     getStatistic(state: StatisticType) {
       return state.statistic;
     },
-    getOperators(state: any) {
+    getOperators(state: OperatorsType) {
       if (loadStorage("options").sum === true) {
         state.operators.push("+");
       }
@@ -88,24 +105,24 @@ export const main = {
       }
       return state.operators;
     },
-    getDefaultRange(state: any) {
+    getDefaultRange(state: DefaultRangeType) {
       return state.defaultRange;
     },
-    getPanel(state: any) {
+    getPanel(state: PanelType) {
       return state.panel;
     },
-    getOptions(state: any) {
+    getOptions(state: FieldsType) {
       return state.options;
     },
-    getConfig(state: any) {
+    getConfig(state: FieldsType) {
       return state.fields;
     },
-    randomOperators(context: any, getters: any) {
+    randomOperators(state: OperatorsType, getters: OperatorsType) {
       return getters.getOperators[
         Math.floor(Math.random() * getters.getOperators.length)
       ];
     },
-    getExpression(context: any, getters: any) {
+    getExpression(state: FieldsType, getters: FieldsType) {
       const expr = getters.getConfig[0];
       if (expr) {
         const expr2 = expr.replaceAll("**", "^");
@@ -113,7 +130,7 @@ export const main = {
         return items.map((item: string) => (item === "^" ? "**" : item));
       }
     },
-    Hint(context: any, getters: any) {
+    Hint(state: FieldsType, getters: FieldsType) {
       return getters.getExpression.join("");
     },
   },
@@ -148,6 +165,71 @@ export const main = {
       context.getters.getConfig.push(eval(arr.join("")));
       setLocalStorage("statistic", context.state.statistic);
       setLocalStorage("config", context.getters.getConfig);
+    },
+
+    tapNext(context: any, payload: any) {
+      if (context.state.count + 1 >= context.getters.getExpression.length)
+        return payload.ref["inp" + context.state.count][0].focus();
+      return context.getters.getExpression.find(() => {
+        context.state.count += 2;
+        return payload.nextTick(() =>
+          payload.ref["inp" + context.state.count][0].focus()
+        );
+      });
+    },
+
+    tapPrev(context: any, payload: any) {
+      if (context.state.count <= 0)
+        return payload.ref["inp" + context.state.count][0].focus();
+      return context.getters.getExpression.find(() => {
+        context.state.count -= 2;
+        return payload.nextTick(() =>
+          payload.ref["inp" + context.state.count][0].focus()
+        );
+      });
+    },
+
+    tapNumber(context: any, payload: any) {
+      payload.ref["inp" + context.state.count][0].value += payload.el;
+    },
+
+    tapEqual(context: any, payload: any) {
+      context.state.showModalComplete = false;
+      context.state.showModalError = false;
+      context.getters.getStatistic.allTasksSession++;
+      context.getters.getStatistic.allTasks++;
+      setLocalStorage("statistic", context.getters.getStatistic);
+      let str = "";
+      for (let i = 0; i <= context.getters.getExpression.length - 1; i++) {
+        if (i % 2 === 0) {
+          str += payload.ref["inp" + i][0].value;
+        }
+        if (i % 2 !== 0) {
+          str += payload.ref["span" + i][0].innerText;
+        }
+      }
+      for (let i = 0; i <= context.getters.getExpression.length - 1; i += 2) {
+        if (!payload.ref["inp" + i][0].value) {
+          context.state.showModalError = true;
+          return context.dispatch("loadConfig");
+        }
+      }
+      if (eval(str) === context.getters.getConfig[1]) {
+        for (let i = 0; i <= context.getters.getExpression.length - 1; i += 2) {
+          payload.ref["inp" + i][0].value = "";
+        }
+        context.getters.getStatistic.completeTasksSession++;
+        context.getters.getStatistic.completeTasks++;
+        setLocalStorage("statistic", context.getters.getStatistic);
+        context.state.showModalComplete = true;
+        return context.dispatch("loadConfig");
+      } else {
+        for (let i = 0; i <= context.getters.getExpression.length - 1; i += 2) {
+          payload.ref["inp" + i][0].value = "";
+        }
+        context.state.showModalError = true;
+        return context.dispatch("loadConfig");
+      }
     },
   },
 };

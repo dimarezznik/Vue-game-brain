@@ -22,7 +22,7 @@
       </button>
     </div>
     <my-modal v-if="showHint" v-model:show="showHint">
-      <h1>{{ getConfig[0] }}={{getConfig[1]}}</h1>
+      <h1>{{ getConfig[0] }}={{ getConfig[1] }}</h1>
     </my-modal>
     <my-modal v-if="showModalComplete" v-model:show="showModalComplete">
       <h1>Правильно!</h1>
@@ -35,7 +35,7 @@
 
 <script>
 import MyModal from "@/components/UI/MyModal";
-import {setLocalStorage} from "@/storage";
+
 
 export default {
   components: {
@@ -44,7 +44,6 @@ export default {
   data() {
     return {
       showHint: false,
-      count: 0,
       showModalComplete: false,
       showModalError: false
     }
@@ -56,57 +55,21 @@ export default {
         return this.Hint
       }
       if (el === '>') {
-        if (this.count + 1 >= this.getExpression.length) return this.$refs['inp' + this.count][0].focus()
-        return this.getExpression.find(() => {
-          this.count += 2
-          return this.$nextTick(() => this.$refs['inp' + this.count][0].focus());
-        })
+        this.$store.dispatch('tapNext', {ref: this.$refs, nextTick: this.$nextTick})
       }
       if (el === '<') {
-        if (this.count <= 0) return this.$refs['inp' + this.count][0].focus()
-        return this.getExpression.find(() => {
-          this.count -= 2
-          return this.$nextTick(() => this.$refs['inp' + this.count][0].focus());
-        })
+        this.$store.dispatch('tapPrev', {ref: this.$refs, nextTick: this.$nextTick})
       }
       if (typeof el == 'number') {
-        this.$refs['inp' + this.count][0].value += el
+        this.$store.dispatch('tapNumber', {ref: this.$refs, el})
       }
       if (el === '=') {
-        this.getStatistic.allTasksSession++
-        this.getStatistic.allTasks++
-        setLocalStorage('statistic', this.getStatistic)
-        let str = ''
-        for (let i = 0; i <= this.getExpression.length - 1; i++) {
-          if (i % 2 === 0) {
-            str += this.$refs['inp' + i][0].value
-          }
-          if (i % 2 !== 0) {
-            str += this.$refs['span' + i][0].innerText
-          }
+        this.$store.dispatch('tapEqual', {ref: this.$refs})
+        if (this.getModals.showModalComplete) {
+         return this.showModalComplete = true
         }
-        for (let i = 0; i <= this.getExpression.length - 1; i += 2) {
-          if (!this.$refs['inp' + i][0].value) {
-            this.loadConfig();
-            return this.showModalError = true
-          }
-
-        }
-        if (eval(str) === this.getConfig[1]) {
-          for (let i = 0; i <= this.getExpression.length - 1; i += 2) {
-            this.$refs['inp' + i][0].value = ''
-          }
-          this.getStatistic.completeTasksSession++
-          this.getStatistic.completeTasks++
-          setLocalStorage('statistic', this.getStatistic)
-          this.showModalComplete = true
-          this.loadConfig();
-        } else {
-          for (let i = 0; i <= this.getExpression.length - 1; i += 2) {
-            this.$refs['inp' + i][0].value = ''
-          }
-          this.showModalError = true
-          this.loadConfig();
+        if (this.getModals.showModalError) {
+         return this.showModalError = true
         }
       }
     },
@@ -119,6 +82,9 @@ export default {
   },
 
   computed: {
+    getModals() {
+      return this.$store.getters.getModals
+    },
     getStatistic() {
       return this.$store.getters.getStatistic
     },

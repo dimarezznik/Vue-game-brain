@@ -7,9 +7,6 @@
 <script>
 
 export default {
-  data() {
-    return {}
-  },
   methods: {
     loadConfig() {
       this.$store.dispatch('loadConfig')
@@ -17,10 +14,6 @@ export default {
       this.$router.push('/game')
     }
   },
-  computed: {
-
-  },
-
 }
 </script>
 
