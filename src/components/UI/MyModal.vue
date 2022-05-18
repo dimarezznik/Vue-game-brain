@@ -35,9 +35,13 @@ export default defineComponent({
 }
 
 .modal-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 100px auto;
   background: white;
   height: 200px;
   width: 400px;
 }
+
 </style>

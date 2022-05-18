@@ -1,17 +1,16 @@
 <template>
   <div class="main">
     <head-game></head-game>
-    <calculation-game></calculation-game>
+    <game-calculation></game-calculation>
   </div>
 </template>
 
 <script>
 import HeadGame from "@/components/Game/HeadGame";
-import CalculationGame from "@/components/Game/CalculationGame";
-
+import GameCalculation from "@/components/Game/GameCalculation";
 export default {
   components: {
-    HeadGame, CalculationGame
+    HeadGame, GameCalculation
   },
 }
 </script>

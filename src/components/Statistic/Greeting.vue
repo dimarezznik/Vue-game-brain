@@ -1,17 +1,43 @@
 <template>
   <article class="greeting">
-    <h1 @click="storage">Привет!</h1>
-    <p>Добро пожаловать на 24 тренировочный день, Ваш последний результат - решено 10 из 25. <br>
-      Общая точность - 80%</p>
+    <h1>Привет!</h1>
+    <p>Добро пожаловать на {{ isDay }} тренировочный день, Ваш последний результат - решено {{
+        getStatistic.completeTasksSession || 0
+      }} из {{ getStatistic.allTasksSession || 0 }}. <br>
+      Общая точность - {{Math.floor(getStatistic.completeTasks / getStatistic.allTasks * 100) || 0}}%</p>
   </article>
 </template>
 
 <script>
+import {loadStorage, loadStorageRange, loadStorageStatistic, setLocalStorage} from "@/storage";
+
 export default {
-  methods: {
-    storage() {
-      console.log(localStorage.getItem('sum'))
+  data: () => {
+    return {
+      date: loadStorage('date'),
+      isDay: loadStorageRange('day')
     }
+  },
+  methods: {
+    getDay() {
+      if (new Date().toLocaleString().split('').slice(0, 10).join('') !== this.date) {
+        this.isDay++
+        setLocalStorage('day', this.isDay)
+      }
+    },
+    getDate() {
+      return setLocalStorage('date',  new Date().toLocaleString().split('').slice(0, 10).join(''))
+    },
+  },
+  computed: {
+    getStatistic() {
+      return loadStorageStatistic('statistic')
+    },
+
+  },
+  mounted() {
+    this.getDay()
+    this.getDate()
   }
 }
 </script>

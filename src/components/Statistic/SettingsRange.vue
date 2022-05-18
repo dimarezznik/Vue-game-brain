@@ -3,40 +3,34 @@
     <h2>Настройки</h2>
     <div>
       <div class="span-space">
-        <span>{{ ranges.minRange }}</span> <span>{{ ranges.maxTimeRange }}</span>
+        <span>{{ getDefaultRange.minRange }}</span> <span>{{ getDefaultRange.maxTimeRange }}</span>
       </div>
-      <input type="range" :min="ranges.minRange" :max="ranges.maxTimeRange" :step="ranges.step" class="range"
+      <input type="range" :min="getDefaultRange.minRange" :max="getDefaultRange.maxTimeRange" :step="getDefaultRange.step" class="range"
              ref="timerInp" @change="changeTimerRange"
-             v-model.number="timeRange">
-      <p>Длительность {{ timeRange }} минут</p>
+             v-model.number="getDefaultRange.timeRange">
+      <p>Длительность {{ getDefaultRange.timeRange }} минут</p>
     </div>
     <div>
       <div class="span-space">
-        <span>{{ ranges.minRange }}</span> <span>{{ ranges.maxComplexityRange }}</span>
+        <span>{{ getDefaultRange.minRange }}</span> <span>{{ getDefaultRange.maxComplexityRange }}</span>
       </div>
       <input type="range"
-             :min="ranges.minRange"
-             :max="ranges.maxComplexityRange"
-             :step="ranges.step" class="range"
-             v-model.number="complexityRange"
+             :min="getDefaultRange.minRange"
+             :max="getDefaultRange.maxComplexityRange"
+             :step="getDefaultRange.step" class="range"
+             v-model.number="getDefaultRange.complexityRange"
              ref="complexityRange"
              @change="changeComplexityRange">
-      <p>Сложность {{ complexityRange }}</p>
+      <p>Сложность {{ getDefaultRange.complexityRange }}</p>
     </div>
   </article>
 </template>
 
 <script>
-import {setLocalStorage, loadStorageNumber, defaultRange} from "@/storage";
+import {setLocalStorage} from "@/storage";
 
 export default {
-  data() {
-    return {
-      ranges: defaultRange,
-      timeRange: loadStorageNumber('timeRange') || 1,
-      complexityRange: loadStorageNumber('complexityRange') || 1,
-    }
-  },
+
   methods: {
     changeComplexityRange() {
       this.complexityRange = this.$refs.complexityRange.value
@@ -47,9 +41,11 @@ export default {
       setLocalStorage('timeRange', this.timeRange)
     }
   },
-  computed: {},
-
-
+  computed: {
+    getDefaultRange() {
+      return this.$store.getters.getDefaultRange
+    }
+  }
 }
 </script>
 

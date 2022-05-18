@@ -10,18 +10,18 @@
 
 <script>
 import MyCheckbox from "@/components/UI/MyCheckbox";
-import {loadStorageBoolean, setLocalStorage} from "@/storage";
+import {loadStorage, setLocalStorage} from "@/storage";
 export default {
   components: {
     MyCheckbox
   },
   data() {
     return {
-      sum: loadStorageBoolean('options').sum || false,
-      diff: loadStorageBoolean('options').diff || false,
-      mult: loadStorageBoolean('options').mult || false,
-      division: loadStorageBoolean('options').division || false,
-      degree: loadStorageBoolean('options').degree || false,
+      sum: loadStorage('options').sum || false,
+      diff: loadStorage('options').diff || false,
+      mult: loadStorage('options').mult || false,
+      division: loadStorage('options').division || false,
+      degree: loadStorage('options').degree || false,
     }
   },
   methods: {

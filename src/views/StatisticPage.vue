@@ -1,11 +1,9 @@
 <template>
   <div class="main">
-    <greeting />
+    <greeting/>
     <settings-range></settings-range>
     <settings-checkbox></settings-checkbox>
-    <div class="btn-con">
-      <button @click="$router.push('/game')" class="btn">Play!</button>
-    </div>
+    <setting-play></setting-play>
   </div>
 </template>
 
@@ -14,15 +12,17 @@ import MyCheckbox from '@/components/UI/MyCheckbox.vue'
 import Greeting from "@/components/Statistic/Greeting.vue";
 import SettingsRange from '@/components/Statistic/SettingsRange.vue'
 import SettingsCheckbox from "@/components/Statistic/SettingsCheckbox.vue";
-import {loadStorageBoolean} from "@/storage";
+import SettingPlay from "@/components/Statistic/SettingPlay.vue"
 
 export default {
   components: {
     SettingsCheckbox,
     Greeting,
     MyCheckbox,
-    SettingsRange
+    SettingsRange,
+    SettingPlay
   },
+
 
 }
 </script>
@@ -43,25 +43,7 @@ export default {
   width: 500px;
   margin: 50px auto;
 }
-.btn-con {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-}
 
-.btn {
-  position: absolute;
-  padding: 7px;
-  background: white;
-  outline: white;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: -1px 2px 3px;
-  cursor: pointer;
-}
 
-.btn-con:active {
-  bottom: -1px;
-  right: 1px;
-}
 
 </style>
