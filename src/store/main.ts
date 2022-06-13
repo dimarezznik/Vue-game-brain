@@ -12,7 +12,6 @@ import {
   PanelType,
   StatisticType,
 } from "@/types/types";
-import { createLogger } from "vuex";
 
 export const main = {
   state: {
@@ -24,30 +23,24 @@ export const main = {
       timeRange: loadStorageRange("timeRange"),
       complexityRange: loadStorageRange("complexityRange"),
     },
-    statistic: {
-      completeTasksSession:
-        loadStorageStatistic("statistic").completeTasksSession || 0,
-      allTasksSession: loadStorageStatistic("statistic").allTasksSession || 0,
-      allTasks: loadStorageStatistic("statistic").allTasks || 0,
-      completeTasks: loadStorageStatistic("statistic").completeTasks || 0,
-    },
+    statistic: loadStorageStatistic("statistic"),
     panel: [
-      { element: 1, id: 1 },
-      { element: 2, id: 2 },
-      { element: 3, id: 3 },
-      { element: "<", id: 4 },
-      { element: 4, id: 5 },
-      { element: 5, id: 6 },
-      { element: 6, id: 7 },
-      { element: ">", id: 8 },
-      { element: 7, id: 9 },
-      { element: 8, id: 10 },
-      { element: 9, id: 11 },
-      { element: "?", id: 12 },
-      { element: "", id: 13 },
-      { element: 0, id: 14 },
-      { element: "", id: 15 },
-      { element: "=", id: 16 },
+      { element: 1 },
+      { element: 2 },
+      { element: 3 },
+      { element: "<" },
+      { element: 4 },
+      { element: 5 },
+      { element: 6 },
+      { element: ">" },
+      { element: 7 },
+      { element: 8 },
+      { element: 9 },
+      { element: "?" },
+      { element: "" },
+      { element: 0 },
+      { element: "" },
+      { element: "=" },
     ],
     fields: loadStorageArray("config") || [],
     options: loadStorage("options") || {
@@ -68,11 +61,8 @@ export const main = {
       state.fields = [];
     },
     clearStatistic(state: StatisticType) {
-      state.statistic = {
-        ...state.statistic,
-        completeTasksSession: 0,
-        allTasksSession: 0,
-      };
+      state.statistic.completeTasksSession = 0;
+      state.statistic.allTasksSession = 0;
       setLocalStorage("statistic", state.statistic);
     },
   },
@@ -123,10 +113,9 @@ export const main = {
       ];
     },
     getExpression(state: FieldsType, getters: FieldsType) {
-      const expr = getters.getConfig[0];
-      if (expr) {
-        const expr2 = expr.replaceAll("**", "^");
-        const items = expr2.split("");
+      const expression = getters.getConfig[0];
+      if (expression) {
+        const items = expression.replaceAll("**", "^").split("");
         return items.map((item: string) => (item === "^" ? "**" : item));
       }
     },
@@ -137,14 +126,7 @@ export const main = {
   actions: {
     loadConfig(context: any) {
       context.state.fields = [];
-      if (
-        !loadStorage("options").sum &&
-        !loadStorage("options").diff &&
-        !loadStorage("options").mult &&
-        !loadStorage("options").degree &&
-        !loadStorage("options").division
-      )
-        return;
+
       let arr = [];
       do {
         arr = [];
@@ -168,8 +150,9 @@ export const main = {
     },
 
     tapNext(context: any, payload: any) {
-      if (context.state.count + 1 >= context.getters.getExpression.length)
+      if (context.state.count + 1 >= context.getters.getExpression.length) {
         return payload.ref["inp" + context.state.count][0].focus();
+      }
       return context.getters.getExpression.find(() => {
         context.state.count += 2;
         return payload.nextTick(() =>
@@ -179,8 +162,9 @@ export const main = {
     },
 
     tapPrev(context: any, payload: any) {
-      if (context.state.count <= 0)
+      if (context.state.count <= 0) {
         return payload.ref["inp" + context.state.count][0].focus();
+      }
       return context.getters.getExpression.find(() => {
         context.state.count -= 2;
         return payload.nextTick(() =>

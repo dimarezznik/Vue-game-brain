@@ -7,7 +7,7 @@
 
 <script>
 
-import {loadStorageRange, setLocalStorage} from "@/storage";
+import {loadStorage, loadStorageRange, setLocalStorage} from "@/storage";
 
 export default {
   data() {
@@ -20,9 +20,16 @@ export default {
   },
   methods: {
     routeStorage() {
+      if (
+          !loadStorage("options").sum &&
+          !loadStorage("options").diff &&
+          !loadStorage("options").mult &&
+          !loadStorage("options").degree &&
+          !loadStorage("options").division
+      ) return;
+      this.$router.push('/')
       this.$store.commit('clearFields')
       setLocalStorage('config', [])
-      this.$router.push('/')
     },
     onFinish() {
       if (this.seconds === 1) {

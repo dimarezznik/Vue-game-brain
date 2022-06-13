@@ -6,12 +6,18 @@
 
 <script>
 
+import {loadStorage} from "@/storage";
+
 export default {
   methods: {
     loadConfig() {
-      this.$store.dispatch('loadConfig')
-      this.$store.commit('clearStatistic')
-      this.$router.push('/game')
+      for (let key in loadStorage('options')) {
+        if (loadStorage('options')[key]) {
+          this.$store.dispatch('loadConfig')
+          this.$store.commit('clearStatistic')
+          this.$router.push('/game')
+        }
+      }
     }
   },
 }

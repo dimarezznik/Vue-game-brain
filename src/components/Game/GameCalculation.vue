@@ -13,7 +13,7 @@
     <div
         v-for="el in getPanel"
         :style="el.element === '' && 'visibility: hidden'"
-        class="panel-el" :key="el.id">
+        class="panel-el" :key="el.element">
       <button
           @click="tapPanel(el.element)"
           :style="typeof el.element === 'string' && 'background: gray; border: 0'"
