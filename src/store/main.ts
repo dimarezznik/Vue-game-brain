@@ -61,9 +61,10 @@ export const main = {
       state.fields = [];
     },
     clearStatistic(state: StatisticType) {
-      state.statistic.completeTasksSession = 0;
-      state.statistic.allTasksSession = 0;
-      setLocalStorage("statistic", state.statistic);
+      // state.statistic.completeTasksSession = 0;
+      // state.statistic.allTasksSession = 0;
+      // setLocalStorage("statistic", state.statistic);
+      console.log(state.statistic);
     },
   },
   getters: {
@@ -126,23 +127,14 @@ export const main = {
   actions: {
     loadConfig(context: any) {
       context.state.fields = [];
-
       let arr = [];
-      do {
-        arr = [];
-        for (let i = 0; i <= loadStorageRange("complexityRange") * 2; i++) {
-          if (i % 2 === 0) {
-            arr.push(Math.floor(Math.random() * 10));
-          } else {
-            arr.push(context.getters.randomOperators);
-          }
+      for (let i = 0; i <= loadStorageRange("complexityRange") * 2; i++) {
+        if (i % 2 === 0) {
+          arr.push(Math.floor(Math.random() * 10));
+        } else {
+          arr.push(context.getters.randomOperators);
         }
-      } while (
-        !Number.isInteger(eval(arr.join(""))) ||
-        eval(arr.join("")) >= 1000 ||
-        eval(arr.join("")) <= 0 ||
-        eval(arr.join("")) === Infinity
-      );
+      }
       context.getters.getConfig.push(arr.join(""));
       context.getters.getConfig.push(eval(arr.join("")));
       setLocalStorage("statistic", context.state.statistic);
@@ -180,8 +172,6 @@ export const main = {
     tapEqual(context: any, payload: any) {
       context.state.showModalComplete = false;
       context.state.showModalError = false;
-      context.getters.getStatistic.allTasksSession++;
-      context.getters.getStatistic.allTasks++;
       setLocalStorage("statistic", context.getters.getStatistic);
       let str = "";
       for (let i = 0; i <= context.getters.getExpression.length - 1; i++) {
@@ -202,8 +192,6 @@ export const main = {
         for (let i = 0; i <= context.getters.getExpression.length - 1; i += 2) {
           payload.ref["inp" + i][0].value = "";
         }
-        context.getters.getStatistic.completeTasksSession++;
-        context.getters.getStatistic.completeTasks++;
         setLocalStorage("statistic", context.getters.getStatistic);
         context.state.showModalComplete = true;
         return context.dispatch("loadConfig");
